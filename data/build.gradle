@@ -19,11 +19,10 @@ def apiKey = getApiKey()
 
 android {
     namespace 'com.clement.data'
-    compileSdk 33
+    compileSdk rootProject.compileSdkVersion
 
     defaultConfig {
-        minSdk 24
-        targetSdk 33
+        minSdk rootProject.minSdkVersion
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"

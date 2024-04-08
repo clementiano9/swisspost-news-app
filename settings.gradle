@@ -18,3 +18,5 @@ rootProject.name = "NewsApp"
 include ':app'
 include ':domain'
 include ':data'
+include ':core-ui'
+include ':feature-headlines'

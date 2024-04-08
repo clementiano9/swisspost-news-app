@@ -4,5 +4,4 @@
     <!-- Navigation -->
     <string name="nav_main">Headlines</string>
     <string name="nav_news_details">News details</string>
-    <string name="article">Article</string>
 </resources>

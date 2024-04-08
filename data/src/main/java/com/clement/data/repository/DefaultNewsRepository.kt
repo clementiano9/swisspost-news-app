@@ -3,7 +3,7 @@ package com.clement.data.repository
 import com.clement.data.ApiInterface
 import com.clement.data.BuildConfig
 import com.clement.domain.repo.NewsRepository
-import com.clement.model.HeadlinesResponse
+import com.clement.domain.model.HeadlinesResponse
 import javax.inject.Inject
 
 class DefaultNewsRepository @Inject constructor(

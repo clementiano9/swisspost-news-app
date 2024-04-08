@@ -1,6 +1,6 @@
 package com.clement.data
 
-import com.clement.model.HeadlinesResponse
+import com.clement.domain.model.HeadlinesResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
 

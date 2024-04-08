@@ -7,10 +7,10 @@ plugins {
 
 android {
     namespace 'com.clement.domain'
-    compileSdk 33
+    compileSdk rootProject.compileSdkVersion
 
     defaultConfig {
-        minSdk 24
+        minSdk rootProject.minSdkVersion
         targetSdk 33
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

@@ -1,4 +1,4 @@
-package com.clement.model
+package com.clement.domain.model
 
 data class HeadlinesResponse(
     val status: String,
