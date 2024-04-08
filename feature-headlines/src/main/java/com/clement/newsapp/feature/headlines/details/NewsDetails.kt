@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -22,6 +23,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.clement.domain.model.Article
 import com.clement.domain.model.Source
 import com.clement.newsapp.core.ui.R
+import com.clement.newsapp.feature.headlines.extensions.formatDate
 
 @Composable
 fun NewsDetails(article: Article?, onBackPress: () -> Unit) {
@@ -75,6 +77,13 @@ fun NewsDetails(article: Article?, onBackPress: () -> Unit) {
                         lineHeight = 32.sp
                     ),
                     modifier = Modifier.padding(top = 18.dp, bottom = 24.dp)
+                )
+                val context = LocalContext.current
+                Text(
+                    text = "${article?.source?.name} • ${article?.publishedAt?.formatDate(context)}",
+                    Modifier.padding(bottom = 16.dp),
+                    style = MaterialTheme.typography.caption,
+                    fontSize = 14.sp,
                 )
                 Text(
                     text = article?.description ?: "",
