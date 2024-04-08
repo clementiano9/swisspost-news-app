@@ -8,6 +8,7 @@ import com.clement.newsapp.feature.headlines.details.NewsDetails
 import com.clement.newsapp.feature.headlines.extensions.toArticle
 import com.clement.newsapp.feature.headlines.extensions.toBundle
 import com.clement.newsapp.feature.headlines.healines.Headlines
+import com.clement.newsapp.feature.headlines.healines.HeadlinesScreen
 
 object HeadlineNavigation {
     const val MainScreen = "main-screen"
@@ -20,7 +21,7 @@ fun NavGraphBuilder.headlinesGraph(navController: NavHostController) {
     composable(
         HeadlineNavigation.TopNewsScreen
     ) {
-        Headlines() {
+        HeadlinesScreen() {
             val destination = navController.graph.findNode(HeadlineNavigation.NewsDetailsScreen)
             if (destination != null) {
                 navController.navigate(destination.id, it.toBundle())

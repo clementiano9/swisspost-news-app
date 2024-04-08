@@ -2,7 +2,7 @@ package com.clement.newsapp.feature.headlines.viewmodel
 
 import com.clement.domain.usecase.GetHeadlinesUseCase
 import com.clement.newsapp.feature.headlines.healines.HeadlinesViewModel
-import com.clement.data.fake.FakeNewsRepository
+import com.clement.domain.repo.fake.FakeNewsRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import org.junit.Assert.assertFalse

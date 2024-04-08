@@ -1,7 +1,5 @@
 package com.clement.newsapp.feature.headlines.healines
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -14,43 +12,48 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.rememberAsyncImagePainter
 import com.clement.domain.model.Article
 import com.clement.newsapp.core.ui.R
 import com.clement.newsapp.feature.headlines.component.LoadingPlaceholder
-import com.clement.newsapp.feature.headlines.extensions.formatDate
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun Headlines(onItemClick: (article: Article) -> Unit) {
-    val viewModel: HeadlinesViewModel = hiltViewModel()
-    val viewState = viewModel.viewState.collectAsState()
+fun HeadlinesScreen(viewModel: HeadlinesViewModel = hiltViewModel(), onItemClick: (article: Article) -> Unit) {
 
-    val scaffoldState: ScaffoldState = rememberScaffoldState()
-
-    val pullRefreshState = rememberPullRefreshState(viewState.value.isLoading, viewModel::refresh)
-
+    val viewState = viewModel.viewState.collectAsState().value
     LaunchedEffect(key1 = Unit) {
         viewModel.getHeadlines()
     }
 
-    LaunchedEffect(key1 = viewState.value.error) {
-        if (viewState.value.error != null) {
-            val error = viewState.value.error!!
-            scaffoldState.snackbarHostState.showSnackbar(error)
+    Headlines(
+        viewState,
+        onItemClick = onItemClick,
+        onRefresh = viewModel::refresh
+    )
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun Headlines(
+    viewState: HeadlineViewState,
+    onRefresh: () -> Unit,
+    onItemClick: (article: Article) -> Unit
+) {
+
+    val scaffoldState: ScaffoldState = rememberScaffoldState()
+    val pullRefreshState = rememberPullRefreshState(viewState.isLoading, onRefresh)
+
+    LaunchedEffect(key1 = viewState.error) {
+        if (viewState.error != null) {
+            val error = viewState.error
+            scaffoldState.snackbarHostState.showSnackbar(error, duration = SnackbarDuration.Long)
+        } else {
+            scaffoldState.snackbarHostState.currentSnackbarData?.dismiss()
         }
     }
 
@@ -72,21 +75,23 @@ fun Headlines(onItemClick: (article: Article) -> Unit) {
                 .pullRefresh(pullRefreshState),
             contentAlignment = Alignment.Center
         ) {
-            if (viewState.value.isLoading && viewState.value.articles.isEmpty()) {
+            if (viewState.isLoading && viewState.articles.isEmpty()) {
                 LoadingPlaceholder()
             }
             else {
                 LazyColumn(Modifier.fillMaxSize()) {
-                    items(viewState.value.articles) { article ->
-                        ArticleItem(article = article, onClick = { onItemClick(article) })
+                    items(viewState.articles) { article ->
+                        ArticleListItem(article = article, onClick = { onItemClick(article) })
                     }
                 }
             }
 
+            val loadingDesc = stringResource(id = com.clement.newsapp.feature.headlines.R.string.headlines_loading)
             PullRefreshIndicator(
-                viewState.value.isLoading,
+                viewState.isLoading,
                 pullRefreshState,
-                Modifier.align(Alignment.TopCenter),
+                Modifier.align(Alignment.TopCenter)
+                    .semantics { contentDescription = loadingDesc },
                 backgroundColor = Color.White,
                 contentColor =  MaterialTheme.colors.primary,
             )
@@ -95,55 +100,16 @@ fun Headlines(onItemClick: (article: Article) -> Unit) {
 
 }
 
-/**
- * Article Item with image and headline
- */
-@Composable
-fun ArticleItem(article: Article, onClick: (Article) -> Unit) {
-    val localContext = LocalContext.current
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 10.dp)
-            .clickable { onClick(article) }
-    ) {
-
-        Image(
-            painter = if (article.urlToImage != null) rememberAsyncImagePainter(model = article.urlToImage)
-            else painterResource(id = R.drawable.empty_news),
-            contentDescription = null,
-            Modifier
-                .padding(end = 16.dp)
-                .size(100.dp)
-                .align(Alignment.CenterVertically)
-                .clip(shape = MaterialTheme.shapes.medium),
-            contentScale = if (article.urlToImage != null) ContentScale.Crop else ContentScale.Inside
-        )
-
-        Column {
-            Text(
-                text = article.title,
-                color = Color.Black,
-                lineHeight = 20.sp,
-                modifier = Modifier
-                    .padding(bottom = 4.dp)
-                    .alpha(0.8f),
-                fontWeight = FontWeight.Medium,
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Text(
-                text = article.publishedAt.formatDate(localContext),
-                style = MaterialTheme.typography.caption,
-                modifier = Modifier.alpha(0.45f),
-            )
-
-        }
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
 fun HeadlinesPreview() {
-    Headlines(onItemClick = {})
+    Headlines(
+        viewState = HeadlineViewState(
+            articles = emptyList(),
+            isLoading = true,
+            error = null
+        ),
+        onItemClick = {},
+        onRefresh = {}
+    )
 }
