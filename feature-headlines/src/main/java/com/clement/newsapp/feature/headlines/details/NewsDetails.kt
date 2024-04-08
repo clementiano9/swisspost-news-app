@@ -1,5 +1,7 @@
 package com.clement.newsapp.feature.headlines.details
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -7,11 +9,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -27,6 +31,10 @@ import com.clement.newsapp.feature.headlines.extensions.formatDate
 
 @Composable
 fun NewsDetails(article: Article?, onBackPress: () -> Unit) {
+    val context = LocalContext.current
+    val intent = remember { Intent(Intent.ACTION_VIEW, Uri.parse(article?.url)) }
+    val shareIntent = Intent.createChooser(intent, null)
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
@@ -43,6 +51,14 @@ fun NewsDetails(article: Article?, onBackPress: () -> Unit) {
                         )
                     }
                 },
+                actions = {
+                    IconButton(onClick = { context.startActivity(shareIntent) }) {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_share),
+                            contentDescription = null
+                        )
+                    }
+                }
             )
         }
     ) {
@@ -53,16 +69,17 @@ fun NewsDetails(article: Article?, onBackPress: () -> Unit) {
                 .verticalScroll(rememberScrollState())
                 .fillMaxSize()
         ) {
-            if (article?.urlToImage != null) {
+//            if (article?.urlToImage != null) {
                 Image(
-                    painter = rememberAsyncImagePainter(model = article.urlToImage),
+                    painter = if (article?.urlToImage != null) rememberAsyncImagePainter(model = article.urlToImage)
+                    else painterResource(id = R.drawable.empty_news),
                     contentDescription = null,
                     Modifier
                         .fillMaxWidth()
                         .height(200.dp),
                     contentScale = ContentScale.Crop
                 )
-            }
+//            }
             Column(
                 Modifier
                     .padding(16.dp)
